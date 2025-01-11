@@ -1,0 +1,9 @@
+path : ./Dataset/tensorflow obj detection drone/
+train: /train
+val: /test
+
+# No of classes
+nc = 4
+
+# classes
+names: ["Bird", "Drone", "Airplane", "Helicopter"]

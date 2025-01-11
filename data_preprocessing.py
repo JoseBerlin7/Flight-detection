@@ -41,7 +41,7 @@ def csv_2_yolo(csv_path, store_dir):
         yolo_annot = f"{class_id} {center_x} {center_y} {box_width} {box_height}"
 
         # Saving in a text file 
-        txt_file = os.path(store_dir, os.path.splitext(filename)[0]+".txt")
+        txt_file = os.path.join(store_dir, os.path.splitext(filename)[0]+".txt")
         with open(txt_file, 'a') as file:
             file.write(yolo_annot)
         
