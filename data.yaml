@@ -1,9 +1,13 @@
-path : ./Dataset/tensorflow obj detection drone/
-train: /train
-val: /test
+# Dataset root path
+path: C:/Users/Jose Berlin/OneDrive/Documents/Projects/Drone-detection/Dataset/tensorflow obj detection drone
 
-# No of classes
-nc = 4
+train: C:/Users/Jose Berlin/OneDrive/Documents/Projects/Drone-detection/Dataset/tensorflow obj detection drone/train
+val: C:/Users/Jose Berlin/OneDrive/Documents/Projects/Drone-detection/Dataset/tensorflow obj detection drone/test
+# No. of Classes
+nc: 4
 
-# classes
-names: ["Bird", "Drone", "Airplane", "Helicopter"]
+names:
+  - Bird
+  - Drone
+  - Airplane
+  - Helicopter
