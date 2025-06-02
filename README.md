@@ -10,4 +10,4 @@ Goal:
 Achievement:
 
     1. Fine-tuned the model several times, and achieved a model with less to no Overfitting
-    2. The model has achieved 90% accuracy on unseen test data (which is more than I expected)
+    2. The model has achieved ~89% accuracy on unseen test data (which is more than I expected)
