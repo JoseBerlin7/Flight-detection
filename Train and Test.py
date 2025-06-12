@@ -7,7 +7,7 @@ import cv2
 import mlflow
 import mlflow.keras
 
-# Configurations and constants
+# Configurations
 CSV_DIR = "Dataset/tensorflow obj detection drone"
 TRAIN_CSV_PATH = os.path.join(CSV_DIR, "train", "_annotations.csv")
 TEST_CSV_PATH = os.path.join(CSV_DIR, "test", "_annotations.csv")
@@ -20,7 +20,6 @@ NUM_CLASSES = len(CLASS_MAP)
 IMAGE_SIZE = (224, 224)
 BATCH_SIZE = 32
 
-# Helper Functions
 def clear_and_create_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -152,10 +151,10 @@ def main():
 
     # Step 4: MLflow experiment tracking
     mlflow.set_experiment("Drone_Detection")
-    mlflow.tensorflow.autolog()  # Enabling autologging
+    mlflow.tensorflow.autolog()  # autologging
 
     with mlflow.start_run():
-        # parameter logging (to get some explicit control)
+        # parameter logging (for getting some explicit control)
         mlflow.log_param("batch_size", BATCH_SIZE)
         mlflow.log_param("image_size", IMAGE_SIZE)
         mlflow.log_param("num_classes", NUM_CLASSES)
@@ -168,7 +167,6 @@ def main():
             verbose=1
         )
 
-        # Manual model logging
         # mlflow.keras.log_model(model, "model")
 
     print("Training complete! Model and metrics logged to MLflow.")
