@@ -3,11 +3,10 @@ import shutil
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-import cv2
 import mlflow
 import mlflow.keras
 
-# Configurations
+# Configurations and constants
 CSV_DIR = "Dataset/tensorflow obj detection drone"
 TRAIN_CSV_PATH = os.path.join(CSV_DIR, "train", "_annotations.csv")
 TEST_CSV_PATH = os.path.join(CSV_DIR, "test", "_annotations.csv")
@@ -20,6 +19,7 @@ NUM_CLASSES = len(CLASS_MAP)
 IMAGE_SIZE = (224, 224)
 BATCH_SIZE = 32
 
+# Helper Functions
 def clear_and_create_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -69,10 +69,15 @@ def preprocess_image(image_path, target_size=IMAGE_SIZE):
     return img
 
 def load_dataset(images_dir, labels_dir, target_size=IMAGE_SIZE, batch_size=BATCH_SIZE):
-    image_paths = []
-    for filename in os.listdir(images_dir):
-        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-            image_paths.append(os.path.join(images_dir, filename))
+    image_paths = sorted([
+        os.path.join(images_dir, f)
+        for f in os.listdir(images_dir)
+        if f.lower().endswith(('.png', '.jpg', '.jpeg'))
+    ])
+
+    image_names = [os.path.basename(p) for p in image_paths]
+    class_ids = get_class_ids_from_yolo(labels_dir, image_names)
+
     
     def load_and_preprocess(path):
         return preprocess_image(path, target_size)
@@ -80,7 +85,7 @@ def load_dataset(images_dir, labels_dir, target_size=IMAGE_SIZE, batch_size=BATC
     dataset = tf.data.Dataset.from_tensor_slices(image_paths)
     dataset = dataset.map(load_and_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     dataset = dataset.batch(batch_size).prefetch(tf.data.AUTOTUNE)
-    return dataset
+    return dataset, class_ids
 
 def get_class_ids_from_yolo(labels_dir, image_names):
     class_ids = []
@@ -121,19 +126,11 @@ def main():
     csv_to_yolo(TEST_CSV_PATH, TEST_LABELS_DIR)
 
     # Step 2: Loading images and Assigning the datasets to variables
-    train_dataset = load_dataset(TRAIN_IMAGES_DIR, TRAIN_LABELS_DIR)
-    test_dataset = load_dataset(TEST_IMAGES_DIR, TEST_LABELS_DIR)
+    train_dataset,train_class_ids = load_dataset(TRAIN_IMAGES_DIR, TRAIN_LABELS_DIR)
+    test_dataset, test_class_ids = load_dataset(TEST_IMAGES_DIR, TEST_LABELS_DIR)
 
     # Step 3: Building the model and preparing REAL labels from YOLO files
     model = build_model((*IMAGE_SIZE, 3), NUM_CLASSES)
-
-    # createing the list of image names
-    train_image_names = [f for f in os.listdir(TRAIN_IMAGES_DIR) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-    test_image_names = [f for f in os.listdir(TEST_IMAGES_DIR) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-
-    # Getting the class IDs from YOLO label files
-    train_class_ids = get_class_ids_from_yolo(TRAIN_LABELS_DIR, train_image_names)
-    test_class_ids = get_class_ids_from_yolo(TEST_LABELS_DIR, test_image_names)
 
     # Checking for missing labels
     assert -1 not in train_class_ids, "Missing train labels detected!"
@@ -151,10 +148,10 @@ def main():
 
     # Step 4: MLflow experiment tracking
     mlflow.set_experiment("Drone_Detection")
-    mlflow.tensorflow.autolog()  # autologging
+    mlflow.keras.autolog()  # Enabling autologging
 
     with mlflow.start_run():
-        # parameter logging (for getting some explicit control)
+        # parameter logging (to get some explicit control)
         mlflow.log_param("batch_size", BATCH_SIZE)
         mlflow.log_param("image_size", IMAGE_SIZE)
         mlflow.log_param("num_classes", NUM_CLASSES)
@@ -163,11 +160,12 @@ def main():
         history = model.fit(
             train_dataset_with_labels,
             validation_data=test_dataset_with_labels,
-            epochs=200,  
+            epochs=39,  
             verbose=1
         )
 
-        # mlflow.keras.log_model(model, "model")
+        # Manual model logging
+        mlflow.keras.log_model(model, "model")
 
     print("Training complete! Model and metrics logged to MLflow.")
 
