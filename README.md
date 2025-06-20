@@ -3,7 +3,7 @@
 ```markdown
 # 🛰️ Drone Object Classification using YOLO Labels and TensorFlow CNN
 
-This project focuses on classifying aerial objects such as **Drones**, **Birds**, **Helicopters**, and **Airplanes** from images using YOLO-annotated data and a Convolutional Neural Network built with TensorFlow.
+This project focuses on classifying aerial objects such as Drones, Birds, Helicopters, and Airplanes from images using YOLO-annotated data and a Convolutional Neural Network built with TensorFlow.
 
 ## 📁 Dataset Structure
 
@@ -30,7 +30,7 @@ Each `_annotations.csv` should include the following columns:
 
 ## 🧠 Classes
 
-```python
+````python
 CLASS_MAP = {
   "Bird": 0,
   "Drone": 1,
@@ -39,20 +39,21 @@ CLASS_MAP = {
 }
 ````
 
+
 ## ⚙️ Workflow Overview
 
-1. **Convert** CSV annotations into YOLO format labels.
-2. **Preprocess** images into TensorFlow-friendly tensors.
-3. **Load** datasets and extract class IDs for classification.
-4. **Build and train** a CNN model using TensorFlow.
-5. **Track and log** experiments using MLflow.
+1. Convert CSV annotations into YOLO format labels.
+2. Preprocess images into TensorFlow-friendly tensors.
+3. Load datasets and extract class IDs for classification.
+4. Build and train a CNN model using TensorFlow.
+5. Track and log experiments using MLflow.
 
 ## 🚀 How to Run
 
 ### 1. Install Dependencies
 
 ```bash
-pip install tensorflow pandas numpy opencv-python mlflow
+pip install -r requirements.txt
 ```
 
 > Ensure `mlflow` is properly set up and configured for experiment tracking.
@@ -60,7 +61,7 @@ pip install tensorflow pandas numpy opencv-python mlflow
 ### 2. Run the Training Script
 
 ```bash
-python your_script_name.py
+python Train_n_Test.py
 ```
 
 This will:
@@ -69,7 +70,7 @@ This will:
 * Train a CNN model on the aerial object images
 * Log parameters, metrics, and model artifacts to MLflow
 
-### 3. Launch MLflow UI (Optional)
+### 3. Launch MLflow UI
 
 ```bash
 mlflow ui
@@ -93,16 +94,9 @@ Optimizer: `Adam`
 
 ## 🧪 Notes
 
-* Labels are parsed only for the **first object** per image.
-* This is a **classification task**, not object detection.
+* Labels are parsed only for the first object per image.
+* This is a classification task, not object detection.
 * Be sure to fix image-label ordering before training!
-
-## ✅ TODO (Future Improvements)
-
-* Add bounding box regression (object detection)
-* Use pre-trained models (MobileNet, ResNet)
-* Add data augmentation
-* Add early stopping and model checkpointing
 
 ---
 
